@@ -1,8 +1,10 @@
 import fetch from 'node-fetch';
 import Zip from 'adm-zip';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const __dirname = new URL('.', import.meta.url).pathname;
-const DATA_DIR = __dirname + 'raw_data/';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DATA_DIR = path.join(__dirname, 'raw_data/');
 
 // Get the GTFS data from the SEPTA GitHub repository
 const url = 'https://github.com/septadev/GTFS/releases/download/v202302261/gtfs_public.zip';
@@ -24,6 +26,7 @@ for (const gtfsFeed of fullZip.getEntries()) {
   const gtfsFeedZip = new Zip(gtfsFeedData);
   const gtfsType = /google_(\w+).zip/.exec(gtfsFeedName)[1];
 
-  gtfsFeedZip.extractAllTo(DATA_DIR + 'septa_' + gtfsType, true);
-  console.log(`Extracted into ${DATA_DIR}septa_${gtfsType}...`);
+  const outputFolder = path.join(DATA_DIR, 'septa_' + gtfsType);
+  gtfsFeedZip.extractAllTo(outputFolder, true);
+  console.log(`Extracted into ${outputFolder}...`);
 }
